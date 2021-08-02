@@ -8,7 +8,7 @@ from ..types import (
     InferenceRequest,
     InferenceResponse,
 )
-from ..middleware import inference_request_middlewares, inference_response_middlewares
+from ..middleware import inference_middlewares
 
 
 class DataPlane:
@@ -54,15 +54,13 @@ class DataPlane:
 
         model = await self._model_registry.get_model(name, version)
 
-        inference_request_middlewares(payload, model._settings)
+        # Run middlewares
+        inference_middlewares(payload, model._settings)
 
         # TODO: Make await optional for sync methods
         prediction = await model.predict(payload)
 
-        inference_response_middlewares(prediction, model._settings)
-
         # Ensure ID matches
-        # TODO: Move to middleware
         prediction.id = payload.id
 
         return prediction
