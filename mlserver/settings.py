@@ -23,11 +23,17 @@ class Settings(BaseSettings):
     server_version: str = __version__
     extensions: List[str] = []
 
-    # Server settings
+    # HTTP Server settings
     host: str = "0.0.0.0"
     http_port: int = 8080
+    # GRPC Server settings
     grpc_port: int = 8081
     grpc_workers: int = 10
+    # Kakfa Server settings
+    kafka_enable: bool = False
+    kafka_servers: str = "localhost:9092"
+    kafka_topic_input: str = "mlserver-input"
+    kafka_topic_output: str = "mlserver-output"
 
 
 class ModelParameters(BaseSettings):

@@ -11,6 +11,7 @@ from .handlers import DataPlane, ModelRepositoryHandlers
 from .parallel import load_inference_pool, unload_inference_pool
 from .rest import RESTServer
 from .grpc import GRPCServer
+from .kafka import KafkaServer
 
 HANDLED_SIGNALS = [signal.SIGINT, signal.SIGTERM]
 
@@ -39,6 +40,10 @@ class MLServer:
         self._grpc_server = GRPCServer(
             self._settings, self._data_plane, self._model_repository_handlers
         )
+        if self._settings.kafka_enable:
+            self._kafka_server = KafkaServer(
+                self._settings, self._data_plane, self._model_repository_handlers
+            )
 
         # TODO: Discover models from ModelRepository
         # TODO: Add flag to disable autoload of models
@@ -49,12 +54,16 @@ class MLServer:
 
     async def add_custom_handlers(self, model: MLModel):
         await self._rest_server.add_custom_handlers(model)
+        if self._settings.kafka_enable:
+            await self._kafka_server.add_custom_handlers(model)
 
         # TODO: Add support for custom gRPC endpoints
         # self._grpc_server.add_custom_handlers(handlers)
 
     async def remove_custom_handlers(self, model: MLModel):
         await self._rest_server.delete_custom_handlers(model)
+        if self._settings.kafka_enable:
+            await self._kafka_server.delete_custom_handlers(model)
 
         # TODO: Add support for custom gRPC endpoints
         # self._grpc_server.delete_custom_handlers(handlers)
