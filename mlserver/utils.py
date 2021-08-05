@@ -1,9 +1,14 @@
 import os
+import logging
 
 from typing import List
 
 from .settings import ModelSettings
 from .errors import InvalidModelURI
+
+
+# In order for logging to be captured we need uvicorn logger
+logger = logging.getLogger("uvicorn.error")
 
 
 async def get_model_uri(

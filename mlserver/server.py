@@ -1,5 +1,6 @@
 import asyncio
 import signal
+import logging
 
 from typing import List
 
@@ -12,6 +13,7 @@ from .parallel import load_inference_pool, unload_inference_pool
 from .rest import RESTServer
 from .grpc import GRPCServer
 from .kafka import KafkaServer
+from .utils import logger
 
 HANDLED_SIGNALS = [signal.SIGINT, signal.SIGTERM]
 
@@ -30,6 +32,10 @@ class MLServer:
         self._model_repository_handlers = ModelRepositoryHandlers(
             repository=self._model_repository, model_registry=self._model_registry
         )
+        if self._settings.debug:
+            logger.setLevel(logging.DEBUG)
+        else:
+            logger.setLevel(logging.INFO)
 
     async def start(self, models: List[MLModel] = []):
         self._add_signal_handlers()
@@ -50,7 +56,9 @@ class MLServer:
         load_tasks = [self._model_registry.load(model) for model in models]
         await asyncio.gather(*load_tasks)
 
-        await asyncio.gather(self._rest_server.start(), self._grpc_server.start())
+        await asyncio.gather(self._rest_server.start(),
+                             self._grpc_server.start(),
+                             self._kafka_server.start())
 
     async def add_custom_handlers(self, model: MLModel):
         await self._rest_server.add_custom_handlers(model)
@@ -77,3 +85,4 @@ class MLServer:
     async def stop(self):
         await self._rest_server.stop()
         await self._grpc_server.stop()
+        await self._kafka_server.stop()
