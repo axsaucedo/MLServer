@@ -47,9 +47,10 @@ class Endpoints:
         self,
         payload: InferenceRequest,
         model_name: str,
+        response: Response,
         model_version: str = None,
     ) -> InferenceResponse:
-        return await self._data_plane.infer(payload, model_name, model_version)
+        return await self._data_plane.infer(payload, model_name, response, model_version)
 
 
 class ModelRepositoryEndpoints:
