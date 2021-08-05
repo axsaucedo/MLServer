@@ -52,7 +52,9 @@ class Endpoints:
         model_version: str = None,
     ) -> InferenceResponse:
         response = await self._data_plane.infer(payload, model_name, model_version)
-        headers = get_cloudevent_headers(response.id, "io.seldon.inference.response")  # type: ignore
+        headers = get_cloudevent_headers(
+            response.id,  # type: ignore
+            "io.seldon.inference.response")
         raw_response.headers.update(headers)
         return response
 
