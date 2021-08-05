@@ -87,4 +87,5 @@ class MLServer:
     async def stop(self):
         await self._rest_server.stop()
         await self._grpc_server.stop()
-        await self._kafka_server.stop()
+        if self._settings.kafka_enable:
+            await self._kafka_server.stop()
