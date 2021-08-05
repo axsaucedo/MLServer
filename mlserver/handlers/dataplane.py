@@ -1,9 +1,7 @@
 import uuid
-from fastapi.responses import Response
 
 from ..settings import Settings
 from ..registry import MultiModelRegistry
-from ..cloudevents import get_cloudevent_headers
 from ..types import (
     MetadataModelResponse,
     MetadataServerResponse,
@@ -52,7 +50,6 @@ class DataPlane:
         self,
         payload: InferenceRequest,
         name: str,
-        response: Response,
         version: str = None,
     ) -> InferenceResponse:
         if payload.id is None:
@@ -68,8 +65,5 @@ class DataPlane:
 
         # Ensure ID matches
         prediction.id = payload.id
-
-        headers = get_cloudevent_headers(prediction.id, "io.seldon.inference.response")
-        response.headers.update(headers)
 
         return prediction

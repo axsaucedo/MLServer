@@ -8,6 +8,7 @@ from ..types import (
     RepositoryIndexRequest,
     RepositoryIndexResponse,
 )
+from ..cloudevents import get_cloudevent_headers
 from ..handlers import DataPlane, ModelRepositoryHandlers
 
 from .utils import to_status_code
@@ -47,10 +48,13 @@ class Endpoints:
         self,
         payload: InferenceRequest,
         model_name: str,
-        response: Response,
+        raw_response: Response,
         model_version: str = None,
     ) -> InferenceResponse:
-        return await self._data_plane.infer(payload, model_name, response, model_version)
+        response = await self._data_plane.infer(payload, model_name, model_version)
+        headers = get_cloudevent_headers(response.id, "io.seldon.inference.response")  # type: ignore
+        raw_response.headers.update(headers)
+        return response
 
 
 class ModelRepositoryEndpoints:
