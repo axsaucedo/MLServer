@@ -56,9 +56,11 @@ class MLServer:
         load_tasks = [self._model_registry.load(model) for model in models]
         await asyncio.gather(*load_tasks)
 
-        await asyncio.gather(self._rest_server.start(),
-                             self._grpc_server.start(),
-                             self._kafka_server.start())
+        await asyncio.gather(
+            self._rest_server.start(),
+            self._grpc_server.start(),
+            self._kafka_server.start(),
+        )
 
     async def add_custom_handlers(self, model: MLModel):
         await self._rest_server.add_custom_handlers(model)
