@@ -1,0 +1,5 @@
+{
+    "name": "payload-transformer",
+    "implementation": "mlserver_payloadtransformer.PayloadTransformerRuntime",
+    "parameters": {}
+}
